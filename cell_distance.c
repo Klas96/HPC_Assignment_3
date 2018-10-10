@@ -10,6 +10,8 @@ int main(int argc, char *argv[]) {
 
   int n_threads = 0;
 
+
+/*
   for(int i = 1; i < argc; i++){
 
     str = argv[i];
@@ -25,7 +27,7 @@ int main(int argc, char *argv[]) {
   }
 
   printf("Kör med %i threads \n",n_threads);
-
+*/
   //Read coordinates -10 to 10 from cells.txt
 
   FILE * coordinates = fopen("cell_data/cell_50","wb+");
