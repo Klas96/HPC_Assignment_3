@@ -5,15 +5,10 @@
 #include <string.h>
 
 int main(int argc, char *argv[]) {
+
+  //Läs inn argumnet
   
   int n_threads = 0;
-
-  char* str;
-  
-  //Ta inn agrument
-  int ret;
-
-  int i;
 
   for(i = 1; i < argc; i++){
 
@@ -31,7 +26,17 @@ int main(int argc, char *argv[]) {
   
   printf("Kör med %i threads \n",n_threads);
   
+  //Read coordinates -10 to 10 from cells.txt
 
+  //calculate distances count frequency rouded to 2 didgets
+
+  //Outbut (stdout) sorted list of distance eith freq.
+  
+  
+  
+  //Note: never use more that 1 GB memory
+  
+  
   return 0;
 }
 
