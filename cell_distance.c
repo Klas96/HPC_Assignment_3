@@ -30,13 +30,13 @@ int main(int argc, char *argv[]) {
 */
   //Read coordinates -10 to 10 from cells.txt
 
-  FILE * coordinates = fopen("cell_data/cell_50","wb+");
+  FILE * fp = fopen("cell_data/cell_50","r");
 
-  char cordStr[24];
+  char buffer[100];
 
-  fread(cordStr, strlen(cordStr) + 1, 1,coordinates);
+  (void) fread(buffer, 7*sizeof(char)+1, 10, fp);
 
-  printf("%s\n", cordStr);
+  printf("%s\n", buffer);
 
   //calculate distances count frequency rouded to 2 didgets
 
