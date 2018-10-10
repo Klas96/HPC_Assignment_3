@@ -28,14 +28,13 @@ int main(int argc, char *argv[]) {
   
   //Read coordinates -10 to 10 from cells.txt
 
+  fread()
+  
   //calculate distances count frequency rouded to 2 didgets
 
   //Outbut (stdout) sorted list of distance eith freq.
-  
-  
-  
+    
   //Note: never use more that 1 GB memory
-  
   
   return 0;
 }
