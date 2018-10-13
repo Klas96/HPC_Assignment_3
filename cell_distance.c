@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
   // läser in variabler
   char * endpt;
   int tn = strtol(argv[1]+2, &endpt,10);
+  //export OMP_NUM_THREADS=tn;
   omp_set_num_threads(tn);
   printf("Kör med %i threads \n",tn);
 
@@ -74,13 +75,13 @@ int main(int argc, char *argv[]) {
     Frequens[i] = 0;
   }
 
-  int i;
-  #pragma omp parallel for private(i) shared(data_p)// reduction(+:Frequens)
-  //#pragma omp parallel
-  for(i = 0; i < rows; i++){
+
+  #pragma omp parallel shared(Frequens)
+  {
+  for(int i = 0; i < rows; i++){
     //dont want to comapre with it self therfor j=(i+1)
-    //int nx = omp_get_thread_num();
-    //printf("Thread %i: I take row %i \n",nx,i);
+    int nx = omp_get_thread_num();
+    printf("Thread %i: I take row %i \n",nx,i);
     for(int j = (i+1); j < rows; j++){
       dist_loc = distence3D(data_p[i*3 + 0] , data_p[i*3 + 1], data_p[i*3 + 2], data_p[j*3 + 0], data_p[j*3 + 1], data_p[j*3 + 2]);
       for(int k = 0; k < 1733; k++){
