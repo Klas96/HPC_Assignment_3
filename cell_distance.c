@@ -49,12 +49,16 @@ int main(int argc, char *argv[]) {
   int rows = sz/24;
   printf("Filstorlek: %i på %i rader\n",sz, rows);
 
+  	//rows*4 byte Storlek på inläsning.
+
   // allokerar minne till data
 
   //float** data_pp = (float **)malloc(rows);
   float* data_p = (float *)malloc(rows*sizeof(float)*3);//tidigare
 
   // läser in data
+
+
   for(size_t ix = 0; ix<rows*3; ix++){
         fscanf(fp, "%f" ,&data_p[ix]);
         //printf("%f \n", data[ix]);
