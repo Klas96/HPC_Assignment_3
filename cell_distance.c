@@ -5,6 +5,7 @@
 #include<string.h>
 #include<time.h>
 
+// mäta tid
 struct timespec start;
 #define CHECKPOINT(fmt, ...) { \
 struct timespec now; \
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
     }
   CHECKPOINT("Finished loading data\n");
   fclose(fp);
-  
+
   //calculate distances count frequency rouded to 2 didgets
 
   //Outbut (stdout) sorted list of distance eith freq.
