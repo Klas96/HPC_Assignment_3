@@ -15,129 +15,143 @@ printf("\n%f: ", elapsed); \
 printf(fmt, ##__VA_ARGS__); \
 }
 
+//parametrar
+
+int* Frequens;
+int* dist;
+
+//float y_loc[3];
+
+
+float data;
+
 //float distence3D(float* x, float* y) {
-int distence3D(float x1, float x2, float x3, float y1, float y2, float y3) {
+int distence3D(float* X, float* Y) {
   //float dist = (x[0]-y[0])*(x[0]-y[0]) + (x[1]-y[1])*(x[1]-y[1]) + (x[2]-y[2])*(x[2]-y[2]);
-  float dist = (x1-y1)*(x1-y1) + (x2-y2)*(x2-y2) + (x3-y3)*(x3-y3);
-  return ((int)(sqrt(dist)*100));
+  float dist_fun = (X[0]-Y[0])*(X[0]-Y[0]) + (X[1]-Y[1])*(X[1]-Y[1]) + (X[2]-Y[2])*(X[2]-Y[2]);
+  return ((int)((sqrt(dist_fun)+0.005)*100));
+
+};
+
+void Comp_and_store(float* X, float* Y){
+
+  int dist_loc = distence3D(X,Y);
+
+  for(int m = 0; m < 3464; m++) {
+    if(dist[m] == dist_loc) {
+      Frequens[m]++;
+      //printf("Freq++ => %i  dist_loc = %i dist[m] = %i \n",Frequens[m],dist_loc, dist[m]);
+      break;
+    }
+  }
 };
 
 
 int main(int argc, char *argv[]) {
   // läser in variabler
+timespec_get(&start, TIME_UTC);
+CHECKPOINT("Start\n")
   char * endpt;
   int tn = strtol(argv[1]+2, &endpt,10);
 
   //export OMP_NUM_THREADS=tn;
   omp_set_num_threads(tn);
-
-  // file pointers
-  FILE * fp1 = fopen("cell_data/test","r");
-  FILE * fp2 = fopen("cell_data/test","r");
+  FILE * fp1 = fopen("cell_data/cell_e2","r");
+  FILE * fp2 = fopen("cell_data/cell_e2","r");
 
   // allokerar minne till data
-  int chunk_sz = 6;//1000/tn/6/sizeof(float); //max data memory per chunk
 
-  //data
-  //float* data_p1 = (float *)malloc(max_load/2);
-  float data_p1[3*tn];
-  float data_p2[chunk_sz*tn];
+  int max_load = 300/tn/sizeof(float); //max data memory
+
+  int max_row = max_load/3;
+
+  float data[max_row][3];
 
   //resultat
 
   int dist_loc;
-  int dist[3464];
-  int freq[3464];
+
+  dist = (int*)malloc((3464)*sizeof(int));
+  Frequens = (int*)malloc((3464)*sizeof(int));
 
   for(int i = 0; i < 3464; i++)
     {
       dist[i] = i;
-      freq[i] = 0;
+      Frequens[i] = 0;
     }
 
-  int blocknr = 0;
+  int lenData1 = 0;
 
 
-  while (fscanf(fp1, "%e",data_p1) != EOF)
-    {
-    //fseek(fp1, blocknr*chunk_sz, SEEK_SET);
-    //fseek(fp2, blocknr*chunk_sz, SEEK_SET);
+  //#pragma omp parallel shared(Frequens) {
+  //while(ftell(fp1) != EOF){
+  CHECKPOINT("Calculating\n")
+  while (fscanf(fp1, "%c",data) != EOF) {
+    fseek(fp1, -1, SEEK_CUR);
+    //fseek(fp1, 0, SEEK_SET);
     //fseek(fp2, 0, SEEK_SET);
-      blocknr++;
+    long int poss = ftell(fp1);
+
+    //printf("Poss = %i\n",poss);
+    fseek(fp2, poss, SEEK_SET);
 
     // läser in data 1
-      printf("Läser data 1\n");
-      #pragma omp parallel shared(freq)
-      for(int i = 0; ; )
-        {
-          //fseek(fp1,+1,SEEK_CUR);
-          if(fscanf(fp1, "%f",data_p1) != EOF)
-            {
-              fseek(fp1, -15, SEEK_CUR);
-        //printf("read data 1");
-        //fread(data_p1[i], sizeof(float), 3, fp1);
-        //printf("%f %f %f\n",data_p1[i][0],data_p1[i][1],data_p1[i][2]);
-                fscanf(fp1, "%f" ,&data_p1[i]);
-                fscanf(fp1, "%f" ,&data_p1[i+1]);
-                fscanf(fp1, "%f" ,&data_p1[i+2]);
-                //printf("%f\n", data_p1[i]);
-                printf("%f %f %f\n",data_p1[i+0],data_p1[i+1],data_p1[i+2]);
+    printf("Data 1:\n");
+    for(int i = 0; i<max_row; i++) {
 
+      fseek(fp1, +1, SEEK_CUR);
+      if(fscanf(fp1, "%c",data) != EOF){
+        fseek(fp1, -2, SEEK_CUR);
 
-                for(int j = 0; j<chunk_sz; j+=3)
-                  {
-          //if(ftell(fp2) != '-1L'){
-                    if(fscanf(fp2, "%f", data_p2) != EOF)
-                      {
-                        printf("Läser data 2\n");
-                        fseek(fp2, -7, SEEK_CUR);
-            //fread(data_p2[j], sizeof(float), 3, fp1);
+        fscanf(fp1, "%f" ,&data[i][0]);
+        fscanf(fp1, "%f" ,&data[i][1]);
+        fscanf(fp1, "%f" ,&data[i][2]);
 
-                        fscanf(fp2, "%f" ,&data_p2[j]);
-                        fscanf(fp2, "%f" ,&data_p2[j+1]);
-                        fscanf(fp2, "%f" ,&data_p2[j+2]);
+        printf("(%f, %f ,%f)\n",data[i][0],data[i][1],data[i][2]);
 
-                        printf("%f %f %f\n",data_p2[j],data_p2[j+1],data_p2[j+2]);
+        lenData1 = i+1;
+      }else{//CHECKPOINT("Finished loading data 1")
+      //printf("Klar data 1\n");
+      break;}
+    }
 
-                        dist_loc = distence3D(data_p1[i + 0] , data_p1[i + 1], data_p1[i + 2], data_p2[j + 0], data_p2[j+ 1], data_p2[j + 2]);
-                        for(int m = 0; m < 3464; m++)
-                          {
-                            if(dist[m] == dist_loc)
-                              {
-                                freq[m]++;
-                                break;
-                              }
-                          }
-                        }
-                      else
-                        {
-                          break;
-                          printf("End of file data 2");
-                        }
+    //Lopar över Data 1
+    #pragma omp parallel for 
+    for(int k = 0; k < lenData1; k++){
+      float y_loc[3];
+      fseek(fp2, poss+1, SEEK_SET);
 
-                    }
-              }
-            else
-              break;
+      //fseek(fp2, k*24+24, SEEK_SET);
+      fseek(fp2, k*24+24, SEEK_CUR);
+
+      printf("Data 2: (%f %f %f) k = %i lenData1 = %i\n",data[k][0],data[k][1],data[k][2],k,lenData1);
+
+      while (fscanf(fp2, "%c",data) != EOF) {
+        fseek(fp2, -2, SEEK_CUR);
+
+        fscanf(fp2, "%f" ,&y_loc[0]);
+        fscanf(fp2, "%f" ,&y_loc[1]);
+        fscanf(fp2, "%f" ,&y_loc[2]);
+
+        printf("(%f, %f ,%f)\n",y_loc[0],y_loc[1],y_loc[2]);
+
+        Comp_and_store(data[k], y_loc);
+
+        fseek(fp2, 1, SEEK_CUR);
+      }
+      //CHECKPOINT("Finished loading data 2")
     }
   }
   fclose(fp1);
   fclose(fp2);
 
-  //calculate distances count frequency rouded to 2 didgets
-
-  //Outbut (stdout) sorted list of distance eith freq.
-
-  //Note: never use more that 1 GB memory
-
-  for(int i = 0; i < 3464; i++)
-    {
-      if(freq[i] != 0)
-        {
-          printf("%2.2f ",dist[i]/100.0f);
-          printf("%i \n",freq[i]);
-        }
+  //printar resultat
+  for(int i = 0; i < 3464; i++){
+    if(Frequens[i] != 0){
+      printf("%2.2f ",dist[i]*0.01);
+      printf("%i \n",Frequens[i]);
     }
-
+  }
+CHECKPOINT("End")
   return 0;
 }
