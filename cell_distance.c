@@ -96,7 +96,7 @@ CHECKPOINT("Start\n")
     fseek(fp2, poss, SEEK_SET);
 
     // läser in data 1
-    printf("Data 1:\n");
+    //printf("Data 1:\n");
     for(int i = 0; i<max_row; i++) {
 
       fseek(fp1, +1, SEEK_CUR);
