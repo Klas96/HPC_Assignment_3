@@ -56,8 +56,8 @@ CHECKPOINT("Start\n")
 
   //export OMP_NUM_THREADS=tn;
   omp_set_num_threads(tn);
-  FILE * fp1 = fopen("cell_data/cell_e2","r");
-  FILE * fp2 = fopen("cell_data/cell_e2","r");
+  FILE * fp1 = fopen("cell_data/cell_e5","r");
+  FILE * fp2 = fopen("cell_data/cell_e5","r");
 
   // allokerar minne till data
 
@@ -107,7 +107,7 @@ CHECKPOINT("Start\n")
         fscanf(fp1, "%f" ,&data[i][1]);
         fscanf(fp1, "%f" ,&data[i][2]);
 
-        printf("(%f, %f ,%f)\n",data[i][0],data[i][1],data[i][2]);
+        //printf("(%f, %f ,%f)\n",data[i][0],data[i][1],data[i][2]);
 
         lenData1 = i+1;
       }else{//CHECKPOINT("Finished loading data 1")
@@ -116,7 +116,7 @@ CHECKPOINT("Start\n")
     }
 
     //Lopar över Data 1
-    #pragma omp parallel for 
+    #pragma omp parallel for
     for(int k = 0; k < lenData1; k++){
       float y_loc[3];
       fseek(fp2, poss+1, SEEK_SET);
@@ -124,7 +124,7 @@ CHECKPOINT("Start\n")
       //fseek(fp2, k*24+24, SEEK_SET);
       fseek(fp2, k*24+24, SEEK_CUR);
 
-      printf("Data 2: (%f %f %f) k = %i lenData1 = %i\n",data[k][0],data[k][1],data[k][2],k,lenData1);
+      //printf("Data 2: (%f %f %f) k = %i lenData1 = %i\n",data[k][0],data[k][1],data[k][2],k,lenData1);
 
       while (fscanf(fp2, "%c",data) != EOF) {
         fseek(fp2, -2, SEEK_CUR);
@@ -133,7 +133,7 @@ CHECKPOINT("Start\n")
         fscanf(fp2, "%f" ,&y_loc[1]);
         fscanf(fp2, "%f" ,&y_loc[2]);
 
-        printf("(%f, %f ,%f)\n",y_loc[0],y_loc[1],y_loc[2]);
+        //printf("(%f, %f ,%f)\n",y_loc[0],y_loc[1],y_loc[2]);
 
         Comp_and_store(data[k], y_loc);
 
