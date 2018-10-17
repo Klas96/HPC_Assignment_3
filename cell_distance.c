@@ -5,13 +5,22 @@
 #include<string.h>
 #include<time.h>
 #include<math.h>
+// mäta tid
+struct timespec start;
+#define CHECKPOINT(fmt, ...) { \
+struct timespec now; \
+timespec_get(&now, TIME_UTC); \
+float elapsed = (now.tv_sec + 1.0e-9 * now.tv_nsec) - (start.tv_sec + 1.0e-9 * start.tv_nsec); \
+printf("\n%f: ", elapsed); \
+printf(fmt, ##__VA_ARGS__); \
+}
 
 //parametrar
 
 //int* Frequens;
 //int* dist;
 
-float y_loc[3];
+//float y_loc[3];
 
 
 float data;
@@ -42,14 +51,16 @@ void Comp_and_store(float* X, float* Y){
 
 
 int main(int argc, char *argv[]) {
-
   // läser in variabler
+timespec_get(&start, TIME_UTC);
+CHECKPOINT("Start\n")
   char * endpt;
   int tn = strtol(argv[1]+2, &endpt,10);
+
   //export OMP_NUM_THREADS=tn;
   omp_set_num_threads(tn);
-  FILE * fp1 = fopen("cell_data/cell_web","r");
-  FILE * fp2 = fopen("cell_data/cell_web","r");
+  FILE * fp1 = fopen("cell_data/cell_e5","r");
+  FILE * fp2 = fopen("cell_data/cell_e5","r");
 
   fseek(fp1, 0, SEEK_END);
 
@@ -61,6 +72,7 @@ int main(int argc, char *argv[]) {
 
   // allokerar minne till data
   int max_load = 5000000/tn/sizeof(float); //max data memory
+  //int max_load = 300/tn/sizeof(float); //max data memory
 
   int max_row = max_load/3;
 
@@ -78,18 +90,20 @@ int main(int argc, char *argv[]) {
 
   int lenData1 = 0;
 
-  char* etc;
 
   //Ta reda på hur lång filen är och för for ist.(Snabbare)
 
   //#pragma omp parallel shared(Frequens) {
+  //while(ftell(fp1) != EOF){
   for (int v = 0; v < tot_row; v++){
   //while (fscanf(fp1, "%c",data) != EOF) {
+  CHECKPOINT("Calculating\n")
+
     fseek(fp1, -1, SEEK_CUR);
 
     long int poss = ftell(fp1);
 
-    printf("Poss = %i\n",poss);
+    //printf("Poss = %i\n",poss);
     fseek(fp2, poss, SEEK_SET);
 
     // läser in data 1
@@ -107,12 +121,15 @@ int main(int argc, char *argv[]) {
         //printf("(%f, %f ,%f)\n",data[i][0],data[i][1],data[i][2]);
 
         lenData1 = i+1;
-      }else{printf("Klar data 1\n");break;}
+      }else{//CHECKPOINT("Finished loading data 1")
+      //printf("Klar data 1\n");
+      break;}
     }
 
     //Lopar över Data 1
-    for(int k = 0; k < lenData1; k++) {
-
+    #pragma omp parallel for
+    for(int k = 0; k < lenData1; k++){
+      float y_loc[3];
       fseek(fp2, poss+1, SEEK_SET);
 
       //fseek(fp2, k*24+24, SEEK_SET);
@@ -135,6 +152,7 @@ int main(int argc, char *argv[]) {
 
         fseek(fp2, 1, SEEK_CUR);
       }
+      //CHECKPOINT("Finished loading data 2")
     }
   }
   //}
@@ -144,10 +162,10 @@ int main(int argc, char *argv[]) {
   //printar resultat
   for(int i = 0; i < 3464; i++){
     if(Frequens[i] != 0){
-      printf("R = %f ",i*0.01);
-      printf("F = %i \n",Frequens[i]);
+      printf("%2.2f ",i*0.01);
+      printf("%i \n",Frequens[i]);
     }
   }
-
+CHECKPOINT("End")
   return 0;
 }
