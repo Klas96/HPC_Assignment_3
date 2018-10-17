@@ -62,17 +62,20 @@ CHECKPOINT("Start\n")
   FILE * fp1 = fopen("cell_data/cell_e5","r");
   FILE * fp2 = fopen("cell_data/cell_e5","r");
 
+  //FILE * fp1 = fopen("cell_data/cell_web","r");//Testing
+  //FILE * fp2 = fopen("cell_data/cell_web","r");//Testing
+
   fseek(fp1, 0, SEEK_END);
 
   long int end_Of_File = ftell(fp1);
 
   fseek(fp1, 0, SEEK_SET);
 
-  int tot_row = end_Of_File/23;
+  int tot_row = end_Of_File/24;
 
   // allokerar minne till data
   int max_load = 5000000/tn/sizeof(float); //max data memory
-  //int max_load = 300/tn/sizeof(float); //max data memory
+  //int max_load = 30/tn/sizeof(float); //max data memory
 
   int max_row = max_load/3;
 
@@ -114,9 +117,7 @@ CHECKPOINT("Start\n")
       if(fscanf(fp1, "%c",data) != EOF){
         fseek(fp1, -2, SEEK_CUR);
 
-        fscanf(fp1, "%f" ,&data[i][0]);
-        fscanf(fp1, "%f" ,&data[i][1]);
-        fscanf(fp1, "%f" ,&data[i][2]);
+        fscanf(fp1, "%f %f %f" ,&data[i][0],&data[i][1],&data[i][2]);
 
         //printf("(%f, %f ,%f)\n",data[i][0],data[i][1],data[i][2]);
 
@@ -142,9 +143,13 @@ CHECKPOINT("Start\n")
       while (fscanf(fp2, "%c",data) != EOF) {
         fseek(fp2, -2, SEEK_CUR);
 
-        fscanf(fp2, "%f" ,&y_loc[0]);
-        fscanf(fp2, "%f" ,&y_loc[1]);
-        fscanf(fp2, "%f" ,&y_loc[2]);
+        //fgets(char *str, int n, fp2);
+
+        //fgets (str, 60, fp)
+
+        fscanf(fp2, "%f %f %f" ,&y_loc[0],&y_loc[1],&y_loc[2]);
+        //fscanf(fp2, "%f" ,&y_loc[1]);
+        //fscanf(fp2, "%f" ,&y_loc[2]);
 
         //printf("(%f, %f ,%f)\n",y_loc[0],y_loc[1],y_loc[2]);
 
