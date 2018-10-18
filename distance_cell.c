@@ -29,8 +29,8 @@ int main(int argc, char *argv[]) {
   //export OMP_NUM_THREADS = tn;
   omp_set_num_threads(tn);
 
-  FILE * fp1 = fopen("cell_data/cell_e5","r");
-  FILE * fp2 = fopen("cell_data/cell_e5","r");
+  FILE * fp1 = fopen("cells","r");
+  FILE * fp2 = fopen("cells","r");
 
   //FILE * fp1 = fopen("cell_data/cell_e4","r");
   //FILE * fp2 = fopen("cell_data/cell_e4","r");
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
   fseek(fp1, 0, SEEK_SET);
 
-  int max_load = 10000000/tn/sizeof(float); //max data memory
+  int max_load = 1000000/tn/sizeof(float); //max data memory
   //int max_load = 80/sizeof(float); //TESTING
   //int lenData1 = 0;
 
@@ -95,6 +95,7 @@ int main(int argc, char *argv[]) {
     }
 
     //Jämför med sig själv
+    #pragma omp parallel for reduction(+:freq[:3465])
     for(int j = 0; j < rows1; j++){
       for(int k = j; k <rows1; k++){
         //Comp_and_store(data1[j],data1[k]);
@@ -129,6 +130,7 @@ int main(int argc, char *argv[]) {
 
       //compare Chunk1 och Chunk2
       //printf("rows1 = %i, rows2 = %i\n", rows1, rows2);
+
       #pragma omp parallel for reduction(+:freq[:3465])
       for(int k = 0; k<rows1; k++){
         for(int l = 0; l < rows2; l++){
