@@ -39,14 +39,7 @@ void Comp_and_store(float* X, float* Y){
 
   int dist_loc = distence3D(X,Y);
 
-  //for(int m = 0; m < 3464; m++) {//TODO kolla 3464
-    //if(dist[m] == dist_loc) {
-    //if(m == dist_loc) {
   Frequens[dist_loc]++;
-
-      //break;
-    //}
-  //}
 };
 
 
@@ -59,11 +52,11 @@ CHECKPOINT("Start\n")
 
   //export OMP_NUM_THREADS=tn;
   omp_set_num_threads(tn);
-  FILE * fp1 = fopen("cell_data/cell_e5","r");
-  FILE * fp2 = fopen("cell_data/cell_e5","r");
+  //FILE * fp1 = fopen("cell_data/cell_e4","r");
+  //FILE * fp2 = fopen("cell_data/cell_e4","r");
 
-  //FILE * fp1 = fopen("cell_data/cell_web","r");//Testing
-  //FILE * fp2 = fopen("cell_data/cell_web","r");//Testing
+  FILE * fp1 = fopen("cell_data/cell_web","r");//Testing
+  FILE * fp2 = fopen("cell_data/cell_web","r");//Testing
 
   fseek(fp1, 0, SEEK_END);
 
@@ -74,20 +67,16 @@ CHECKPOINT("Start\n")
   int tot_row = end_Of_File/24;
 
   // allokerar minne till data
-  int max_load = 5000000/tn/sizeof(float); //max data memory
-  //int max_load = 30/tn/sizeof(float); //max data memory
+  //int max_load = 5000000/tn/sizeof(float); //max data memory
+  int max_load = 30/tn/sizeof(float); //max data memory
 
   int max_row = max_load/3;
 
   float data[max_row][3];
 
-  //dist = (int*)malloc((3464)*sizeof(int));
-  //dist =
   //int Frequens[3465];
 
   for(int i = 0; i < 3465; i++){
-    //dist[i] = i*0.01;//Float
-    //dist[i] = i;//Int
     Frequens[i] = 0;
   }
 
@@ -98,11 +87,11 @@ CHECKPOINT("Start\n")
 
   //#pragma omp parallel shared(Frequens) {
   //while(ftell(fp1) != EOF){
-  for (int v = 0; v < tot_row; v++){
+  for (int v = 0; v < tot_row; v+= max_row){
   //while (fscanf(fp1, "%c",data) != EOF) {
   CHECKPOINT("Calculating\n")
 
-    fseek(fp1, -1, SEEK_CUR);
+    //fseek(fp1, -1, SEEK_CUR);
 
     long int poss = ftell(fp1);
 
@@ -112,8 +101,8 @@ CHECKPOINT("Start\n")
     // läser in data 1
     //printf("Data 1:\n");
     for(int i = 0; i<max_row; i++) {
-      fseek(fp1, +1, SEEK_CUR);
 
+      fseek(fp1, +1, SEEK_CUR);
       if(fscanf(fp1, "%c",data) != EOF){
         fseek(fp1, -2, SEEK_CUR);
 
@@ -128,34 +117,30 @@ CHECKPOINT("Start\n")
     }
 
     //Lopar över Data 1
-    #pragma omp parallel for
+    //#pragma omp parallel for
+    float y_loc[3];
     for(int k = 0; k < lenData1; k++){
-      float y_loc[3];
-      fseek(fp2, poss+1, SEEK_SET);
+      
+      //fseek(fp2, poss+1, SEEK_SET);
 
       //fseek(fp2, k*24+24, SEEK_SET);
-      fseek(fp2, k*24+24, SEEK_CUR);
+      //fseek(fp2, k*24+24, SEEK_CUR);
 
       //printf("Data 2: (%f %f %f) k = %i lenData1 = %i\n",data[k][0],data[k][1],data[k][2],k,lenData1);
 
       //Börja vid första ellemntet i data1 och gå till EOF
-      //for(int w = 0; w < tot_row; w++) {
-      while (fscanf(fp2, "%c",data) != EOF) {
+      for(int w = v; w < tot_row; w++) {
+      //while (fscanf(fp2, "%c",data) != EOF) {
         fseek(fp2, -2, SEEK_CUR);
 
-        //fgets(char *str, int n, fp2);
-
-        //fgets (str, 60, fp)
 
         fscanf(fp2, "%f %f %f" ,&y_loc[0],&y_loc[1],&y_loc[2]);
-        //fscanf(fp2, "%f" ,&y_loc[1]);
-        //fscanf(fp2, "%f" ,&y_loc[2]);
 
         //printf("(%f, %f ,%f)\n",y_loc[0],y_loc[1],y_loc[2]);
 
         Comp_and_store(data[k], y_loc);
 
-        fseek(fp2, 1, SEEK_CUR);
+        //fseek(fp2, 1, SEEK_CUR);
       }
       //CHECKPOINT("Finished loading data 2")
     }
