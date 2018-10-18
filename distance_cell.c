@@ -6,7 +6,7 @@
 #include<string.h>
 #include<time.h>
 #include<math.h>
-
+/*
 // mäta tid
 //struct timespec start;
 //#define CHECKPOINT(fmt, ...) { \
@@ -16,7 +16,7 @@ float elapsed = (now.tv_sec + 1.0e-9 * now.tv_nsec) - (start.tv_sec + 1.0e-9 * s
 printf("\n%f: ", elapsed); \
 printf(fmt, ##__VA_ARGS__); \
 }
-
+*/
 int freq[3465];
 
 void Comp_and_store(float* X, float* Y) {
@@ -42,8 +42,8 @@ int main(int argc, char *argv[]) {
   //export OMP_NUM_THREADS = tn;
   omp_set_num_threads(tn);
 
-  FILE * fp1 = fopen("cell_data/cell_e4","r");
-  FILE * fp2 = fopen("cell_data/cell_e4","r");
+  FILE * fp1 = fopen("cell_data/cell_e5","r");
+  FILE * fp2 = fopen("cell_data/cell_e5","r");
 
   //FILE * fp1 = fopen("cell_data/cell_web","r");//Testing
   //FILE * fp2 = fopen("cell_data/cell_web","r");//Testing
@@ -78,7 +78,6 @@ int main(int argc, char *argv[]) {
 
   int rows1;
   int rows2;
-
 
   printf("chunkNr = %i,restRows = %i, tot_row = %i, chunkSize = %i \n",chunkNr,restRows, tot_row, chunkSize );
 
@@ -137,8 +136,8 @@ int main(int argc, char *argv[]) {
 //CHECKPOINT("Printar resultat \n");
   for(int i = 0; i < 3464; i++){
     if(freq[i] != 0){
-      //printf("%2.2f ",i*0.01);
-      //printf("%i \n",freq[i]);
+      printf("%2.2f ",i*0.01);
+      printf("%i \n",freq[i]);
     }
   }
 //CHECKPOINT("Slut\n");
