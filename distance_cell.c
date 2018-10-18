@@ -6,17 +6,7 @@
 #include<string.h>
 #include<time.h>
 #include<math.h>
-/*
-// mäta tid
-//struct timespec start;
-//#define CHECKPOINT(fmt, ...) { \
-struct timespec now; \
-timespec_get(&now, TIME_UTC); \
-float elapsed = (now.tv_sec + 1.0e-9 * now.tv_nsec) - (start.tv_sec + 1.0e-9 * start.tv_nsec); \
-printf("\n%f: ", elapsed); \
-printf(fmt, ##__VA_ARGS__); \
-}
-*/
+
 int freq[3465];
 
 void Comp_and_store(float* X, float* Y) {
@@ -86,7 +76,7 @@ int main(int argc, char *argv[]) {
   for(int v = 0; v < chunkNr+1; v++){
 
     int nx = omp_get_thread_num();
-    printf("Thread %i: I take row \n",nx);
+    printf("Thread %i: I take row %i\n",nx);
 
     if(v<chunkNr){
       rows1 = chunkSize;
@@ -121,8 +111,12 @@ int main(int argc, char *argv[]) {
       //compare Chunk1 och Chunk2
       for(int k = 0; k<rows1; k++){
         for(int l = k; l < rows2; l++){
-          Comp_and_store(data1[k],data2[l]);
+          //Comp_and_store(data1[k],data2[l]);
 
+          float dist_fun = (data1[0]-data2[0])*(data1[0]-data2[0]) + (data1[1]-data2[1])*(data1[1]-data2[1]) + (data1[2]-data2[2])*(data1[2]-data2[2]);
+          int dist_loc = (int)(((sqrt(dist_fun)+0.005)*100));
+
+          freq[dist_loc]++;
         }
       }
 
