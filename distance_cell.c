@@ -42,12 +42,11 @@ int main(int argc, char *argv[]) {
   //export OMP_NUM_THREADS = tn;
   omp_set_num_threads(tn);
 
-  //FILE * fp1 = fopen("cell_data/cell_e5","r");
-  //FILE * fp2 = fopen("cell_data/cell_e5","r");
+  FILE * fp1 = fopen("cell_data/cell_e5","r");
+  FILE * fp2 = fopen("cell_data/cell_e5","r");
 
   //FILE * fp1 = fopen("cell_data/cell_e4","r");
   //FILE * fp2 = fopen("cell_data/cell_e4","r");
-
 
   //FILE * fp1 = fopen("cell_data/cell_web","r");//Testing
   //FILE * fp2 = fopen("cell_data/cell_web","r");//Testing
@@ -87,7 +86,7 @@ int main(int argc, char *argv[]) {
 
   //Lopar över chunks
   //CHECKPOINT("Börjar chunk loop\n");
-  #pragma omp parallel for reduction(+:freq[:3465])
+
   for(int v = 0; v < chunkNr+1; v++){
 
     int nx = omp_get_thread_num();
@@ -111,7 +110,13 @@ int main(int argc, char *argv[]) {
     //Jämför med sig själv
     for(int j = 0; j < rows1; j++){
       for(int k = j; k <rows1; k++){
-        Comp_and_store(data1[j],data1[k]);
+        //Comp_and_store(data1[j],data1[k]);
+
+        float dist_fun = (data1[j][0]-data1[k][0])*(data1[j][0]-data1[k][0]) + (data1[j][1]-data1[k][1])*(data1[j][1]-data1[k][1]) + (data1[j][2]-data1[k][2])*(data1[j][2]-data1[k][2]);
+        int dist_loc = (int)(((sqrt(dist_fun))*100)+0.5);
+
+        freq[dist_loc]++;
+
       }
     }
 
@@ -136,12 +141,19 @@ int main(int argc, char *argv[]) {
 
       //compare Chunk1 och Chunk2
       //printf("rows1 = %i, rows2 = %i\n", rows1, rows2);
+      #pragma omp parallel for reduction(+:freq[:3465])
       for(int k = 0; k<rows1; k++){
         for(int l = 0; l < rows2; l++){
           //printf("Jämför: ");
           //printf("D1: %f %f %f och ", data1[k][0],data1[k][1],data1[k][2]);
           //printf("D2: %f %f %f\n", data2[l][0],data2[l][1],data2[l][2]);
-          Comp_and_store(data1[k],data2[l]);
+          //Comp_and_store(data1[k],data2[l]);
+
+          float dist_fun = (data1[k][0]-data2[l][0])*(data1[k][0]-data2[l][0]) + (data1[k][1]-data2[l][1])*(data1[k][1]-data2[l][1]) + (data1[k][2]-data2[l][2])*(data1[k][2]-data2[l][2]);
+          int dist_loc = (int)(((sqrt(dist_fun))*100)+0.5);
+
+          freq[dist_loc]++;
+
 
           //float dist_fun = (data1[0]-data2[0])*(data1[0]-Y[0]) + (data1[1]-Y[1])*(data1[1]-Y[1]) + (data1[2]-Y[2])*(data1[2]-Y[2]);
           //int dist_loc = (int)(((sqrt(dist_fun)+0.005)*100));
