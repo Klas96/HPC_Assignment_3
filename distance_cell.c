@@ -82,7 +82,6 @@ int main(int argc, char *argv[]) {
   printf("chunkNr = %i,restRows = %i, tot_row = %i, chunkSize = %i \n",chunkNr,restRows, tot_row, chunkSize );
 
   //Lopar över chunks
-  //CHECKPOINT("Börjar chunk loop\n");
   #pragma omp parallel for reduction(+:freq)
   for(int v = 0; v < chunkNr+1; v++){
 
