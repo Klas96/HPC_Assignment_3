@@ -42,8 +42,8 @@ int main(int argc, char *argv[]) {
   //export OMP_NUM_THREADS = tn;
   omp_set_num_threads(tn);
 
-  FILE * fp1 = fopen("cell_data/cell_e5","r");
-  FILE * fp2 = fopen("cell_data/cell_e5","r");
+  //FILE * fp1 = fopen("cell_data/cell_e5","r");
+  //FILE * fp2 = fopen("cell_data/cell_e5","r");
 
   //FILE * fp1 = fopen("cell_data/cell_e4","r");
   //FILE * fp2 = fopen("cell_data/cell_e4","r");
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
   fseek(fp1, 0, SEEK_SET);
 
-  int max_load = 100000000/tn/sizeof(float); //max data memory
+  int max_load = 1000000/tn/sizeof(float); //max data memory
   //int max_load = 80/sizeof(float); //TESTING
   //int lenData1 = 0;
 
