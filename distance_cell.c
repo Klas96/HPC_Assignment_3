@@ -8,8 +8,8 @@
 #include<math.h>
 
 // mäta tid
-struct timespec start;
-#define CHECKPOINT(fmt, ...) { \
+//struct timespec start;
+//#define CHECKPOINT(fmt, ...) { \
 struct timespec now; \
 timespec_get(&now, TIME_UTC); \
 float elapsed = (now.tv_sec + 1.0e-9 * now.tv_nsec) - (start.tv_sec + 1.0e-9 * start.tv_nsec); \
@@ -32,12 +32,14 @@ void Comp_and_store(float* X, float* Y) {
 int main(int argc, char *argv[]) {
 
   // läser in variabler
-timespec_get(&start, TIME_UTC);
-CHECKPOINT("Start\n")
+//timespec_get(&start, TIME_UTC);
+//CHECKPOINT("Start\n")
 
   char * endpt;
   int tn = strtol(argv[1]+2, &endpt,10);
 
+
+  //export OMP_NUM_THREADS = tn;
   omp_set_num_threads(tn);
 
   FILE * fp1 = fopen("cell_data/cell_e4","r");
@@ -81,8 +83,13 @@ CHECKPOINT("Start\n")
   printf("chunkNr = %i,restRows = %i, tot_row = %i, chunkSize = %i \n",chunkNr,restRows, tot_row, chunkSize );
 
   //Lopar över chunks
-  CHECKPOINT("Börjar chunk loop\n");
+  //CHECKPOINT("Börjar chunk loop\n");
+  #pragma omp parallel for reduction(+:freq)
   for(int v = 0; v < chunkNr+1; v++){
+
+    int nx = omp_get_thread_num();
+    printf("Thread %i: I take row \n",nx);
+
     if(v<chunkNr){
       rows1 = chunkSize;
     }else{
@@ -91,7 +98,7 @@ CHECKPOINT("Start\n")
 
 
     //Läser Chunk 1
-    CHECKPOINT("chunk %i\n",v);
+    //CHECKPOINT("chunk %i\n",v);
     for(int i = 0; i<rows1; i++){
 
       fscanf(fp1, "%f %f %f" ,&data1[i][0],&data1[i][1],&data1[i][2]);
@@ -127,14 +134,14 @@ CHECKPOINT("Start\n")
   fclose(fp1);
   fclose(fp2);
 
-CHECKPOINT("Printar resultat \n");
+//CHECKPOINT("Printar resultat \n");
   for(int i = 0; i < 3464; i++){
     if(freq[i] != 0){
-      printf("%2.2f ",i*0.01);
-      printf("%i \n",freq[i]);
+      //printf("%2.2f ",i*0.01);
+      //printf("%i \n",freq[i]);
     }
   }
-CHECKPOINT("Slut\n");
+//CHECKPOINT("Slut\n");
   return 0;
 
 }
