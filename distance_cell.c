@@ -42,16 +42,11 @@ int main(int argc, char *argv[]) {
   //export OMP_NUM_THREADS = tn;
   omp_set_num_threads(tn);
 
-
-  //  FILE * fp1 = fopen("cell_data/cell_e5","r");
-  //  FILE * fp2 = fopen("cell_data/cell_e5","r");
-
   //FILE * fp1 = fopen("cell_data/cell_e4","r");
   //FILE * fp2 = fopen("cell_data/cell_e4","r");
 
   FILE * fp1 = fopen("cell_data/cell_e5","r");
   FILE * fp2 = fopen("cell_data/cell_e5","r");
-
 
   //FILE * fp1 = fopen("cell_data/cell_web","r");//Testing
   //FILE * fp2 = fopen("cell_data/cell_web","r");//Testing
@@ -62,7 +57,7 @@ int main(int argc, char *argv[]) {
 
   fseek(fp1, 0, SEEK_SET);
 
-  int max_load = 500000/tn/sizeof(float); //max data memory
+  int max_load = 5000000/tn/sizeof(float); //max data memory
   //int max_load = 40/sizeof(float); //TESTING
   //int lenData1 = 0;
 
@@ -94,7 +89,7 @@ int main(int argc, char *argv[]) {
   for(int v = 0; v < chunkNr+1; v++){
 
     int nx = omp_get_thread_num();
-    printf("Thread %i: I take row \n",nx);
+    printf("Thread %i: I take chunk %i\n",nx,v);
 
     if(v<chunkNr){
       rows1 = chunkSize;
@@ -104,7 +99,6 @@ int main(int argc, char *argv[]) {
 
 
     //Läser Chunk 1
-    //CHECKPOINT("chunk %i\n",v);
     for(int i = 0; i<rows1; i++){
 
       fscanf(fp1, "%f %f %f" ,&data1[i][0],&data1[i][1],&data1[i][2]);
