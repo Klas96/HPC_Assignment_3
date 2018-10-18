@@ -1,3 +1,4 @@
+
 #include<omp.h>
 #include<stddef.h>
 #include<stdio.h>
@@ -19,14 +20,14 @@ printf(fmt, ##__VA_ARGS__); \
 int freq[3465];
 
 void Comp_and_store(float* X, float* Y) {
-  //printf("X = %f %f %f\n",X[0],X[1],X[2]);
-  //printf("Y = %f %f %f\n\n",Y[0],Y[1],Y[2]);
 
   float dist_fun = (X[0]-Y[0])*(X[0]-Y[0]) + (X[1]-Y[1])*(X[1]-Y[1]) + (X[2]-Y[2])*(X[2]-Y[2]);
   int dist_loc = (int)(((sqrt(dist_fun)+0.005)*100));
 
   freq[dist_loc]++;
 };
+
+
 
 int main(int argc, char *argv[]) {
 
@@ -51,75 +52,89 @@ CHECKPOINT("Start\n")
 
   fseek(fp1, 0, SEEK_SET);
 
-  int max_load = 10000/tn/sizeof(float); //max data memory
+  int max_load = 500000/tn/sizeof(float); //max data memory
   //int max_load = 40/sizeof(float); //TESTING
   //int lenData1 = 0;
 
-  int max_row = max_load/3;
+  int chunkSize = max_load/6;
 
-  float data[max_row][3];
+  //int chunkSize_ind = chunkSize/2;
+
+  float data1[chunkSize][3];
+  float data2[chunkSize][3];
+
+  //float data1[chunkSize_ind][3];
+  //float data2[chunkSize_ind][3];
+
 
   for(int i = 0; i < 3465; i++){
     freq[i] = 0;
   }
 
-  int chunkNr = (int)tot_row/max_row;
-  int restRows = (tot_row % max_row);
+  int chunkNr = (int)tot_row/chunkSize;
+  int restRows = (tot_row % chunkSize);
 
-  printf("chunkNr = %i,restRows = %i, tot_row = %i, max_row = %i \n",chunkNr,restRows, tot_row, max_row );
+  int rows1;
+  int rows2;
+
+
+  printf("chunkNr = %i,restRows = %i, tot_row = %i, chunkSize = %i \n",chunkNr,restRows, tot_row, chunkSize );
 
   //Lopar över chunks
-  for(int v = 0; v < chunkNr; v++){
-
-    fseek(fp2, v*24*max_row, SEEK_SET);
-
-    printf("chunk %i\n",v);
-    for(int i = 0; i<max_row; i++){
-      fscanf(fp1, "%f %f %f" ,&data[i][0],&data[i][1],&data[i][2]);
-      //printf("rad %i (%f, %f ,%f)\n",(v*max_row+i),data[i][0],data[i][1],data[i][2]);
+  CHECKPOINT("Börjar chunk loop\n");
+  for(int v = 0; v < chunkNr+1; v++){
+    if(v<chunkNr){
+      rows1 = chunkSize;
+    }else{
+      rows1 = restRows;
     }
 
-    //loop genom
-    //printf("Testar main:\n");
-    float y_loc[3];
-    for(int k = 0; k<max_row; k++){
-      //printf("Data 2: %f %f %f",);
-      //printf("Testar: (%f, %f ,%f)\n",data[k][0],data[k][1],data[k][2]);
 
-      fseek(fp2, v*max_row*24, SEEK_SET);
-      fseek(fp2, k*24, SEEK_CUR);
+    //Läser Chunk 1
+    CHECKPOINT("chunk %i\n",v);
+    for(int i = 0; i<rows1; i++){
 
-      for(int j = v*max_row+k; j < tot_row; j++ ){
-        fscanf(fp2, "%f %f %f" ,&y_loc[0],&y_loc[1],&y_loc[2]);
-        Comp_and_store(data[k], y_loc);
+      fscanf(fp1, "%f %f %f" ,&data1[i][0],&data1[i][1],&data1[i][2]);
+      //printf("rad %i (%f, %f ,%f)\n",(v*chunkSize+i),data[i][0],data[i][1],data[i][2]);
+    }
+
+    fseek(fp2, v*24*chunkSize, SEEK_SET);
+
+    //Jmf Chunk 1 med alla chunks
+    for(int j = v; j <  chunkNr+1; j++){
+      if(j<chunkNr){
+        rows2 = chunkSize;
+      }else{
+        rows2 = restRows;
       }
-    }
 
-  }
+      //Läser Chunk 2
+      for(int i = 0; i<rows2; i++){
+        fscanf(fp2, "%f %f %f" ,&data2[i][0],&data2[i][1],&data2[i][2]);
+      }
 
-  printf("Testar Rest:\n");
-  float y_loc[3];
-  for(int i = 0; i < restRows; i++){
+      //compare Chunk1 och Chunk2
+      for(int k = 0; k<rows1; k++){
+        for(int l = k; l < rows2; l++){
+          Comp_and_store(data1[k],data2[l]);
 
-    fscanf(fp1, "%f %f %f" ,&data[i][0],&data[i][1],&data[i][2]);
-    fseek(fp2, 0, SEEK_CUR);
+        }
+      }
 
-    for(int j=0; j < tot_row; j++){
-      fscanf(fp2, "%f %f %f" ,&y_loc[0],&y_loc[1],&y_loc[2]);
-      Comp_and_store(data[i], y_loc);
     }
   }
 
   fclose(fp1);
   fclose(fp2);
 
+CHECKPOINT("Printar resultat \n");
   for(int i = 0; i < 3464; i++){
     if(freq[i] != 0){
-      //printf("%2.2f ",i*0.01);
-      //printf("%i \n",freq[i]);
+      printf("%2.2f ",i*0.01);
+      printf("%i \n",freq[i]);
     }
   }
-
+CHECKPOINT("Slut\n");
   return 0;
 
 }
