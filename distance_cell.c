@@ -42,6 +42,9 @@ int main(int argc, char *argv[]) {
   //export OMP_NUM_THREADS = tn;
   omp_set_num_threads(tn);
 
+  //  FILE * fp1 = fopen("cell_data/cell_e5","r");
+  //  FILE * fp2 = fopen("cell_data/cell_e5","r");
+
   FILE * fp1 = fopen("cell_data/cell_e4","r");
   FILE * fp2 = fopen("cell_data/cell_e4","r");
 
@@ -137,8 +140,8 @@ int main(int argc, char *argv[]) {
 //CHECKPOINT("Printar resultat \n");
   for(int i = 0; i < 3464; i++){
     if(freq[i] != 0){
-      //printf("%2.2f ",i*0.01);
-      //printf("%i \n",freq[i]);
+      printf("%2.2f ",i*0.01);
+      printf("%i \n",freq[i]);
     }
   }
 //CHECKPOINT("Slut\n");
