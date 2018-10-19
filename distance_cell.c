@@ -18,7 +18,6 @@ void Comp_and_store(float* X, float* Y) {
 };
 
 
-
 int main(int argc, char *argv[]) {
 
   // läser in variabler
@@ -29,11 +28,14 @@ int main(int argc, char *argv[]) {
   //export OMP_NUM_THREADS = tn;
   omp_set_num_threads(tn);
 
-  FILE * fp1 = fopen("cells","r");
-  FILE * fp2 = fopen("cells","r");
+  //FILE * fp1 = fopen("cells","r");
+  //FILE * fp2 = fopen("cells","r");
 
   //FILE * fp1 = fopen("cell_data/cell_e4","r");
   //FILE * fp2 = fopen("cell_data/cell_e4","r");
+
+  FILE * fp1 = fopen("cell_data/cell_e5","r");
+  FILE * fp2 = fopen("cell_data/cell_e5","r");
 
   //FILE * fp1 = fopen("cell_data/cell_web","r");//Testing
   //FILE * fp2 = fopen("cell_data/cell_web","r");//Testing
@@ -57,7 +59,6 @@ int main(int argc, char *argv[]) {
 
   //float data1[chunkSize_ind][3];
   //float data2[chunkSize_ind][3];
-
 
   for(int i = 0; i < 3465; i++){
     freq[i] = 0;
@@ -97,7 +98,7 @@ int main(int argc, char *argv[]) {
     //Jämför med sig själv
     #pragma omp parallel for reduction(+:freq[:3465])
     for(int j = 0; j < rows1; j++){
-      for(int k = j; k <rows1; k++){
+      for(int k = j+1; k <rows1; k++){
         //Comp_and_store(data1[j],data1[k]);
 
         float dist_fun = (data1[j][0]-data1[k][0])*(data1[j][0]-data1[k][0]) + (data1[j][1]-data1[k][1])*(data1[j][1]-data1[k][1]) + (data1[j][2]-data1[k][2])*(data1[j][2]-data1[k][2]);
@@ -159,7 +160,7 @@ int main(int argc, char *argv[]) {
   fclose(fp1);
   fclose(fp2);
 
-//CHECKPOINT("Printar resultat \n");
+  //CHECKPOINT("Printar resultat \n");
   for(int i = 0; i < 3464; i++){
     if(freq[i] != 0){
       printf("%2.2f ",i*0.01);
