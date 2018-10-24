@@ -1,4 +1,3 @@
-
 #include<omp.h>
 #include<stddef.h>
 #include<stdio.h>
@@ -46,7 +45,7 @@ int main(int argc, char *argv[]) {
 
   fseek(fp1, 0, SEEK_SET);
 
-  int max_load = 1000000/tn/sizeof(float); //max data memory
+  int max_load = 1000000/sizeof(float); //max data memory
   //int max_load = 80/sizeof(float); //TESTING
   //int lenData1 = 0;
 
